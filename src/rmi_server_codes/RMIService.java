@@ -8,6 +8,8 @@ public interface RMIService extends Remote{
 	public int add(int a, int b) throws RemoteException;
 
 	public String getAllSensorDetails() throws RemoteException;
+
+	public String loginValidator(String email, String password) throws RemoteException;
 	
 	
 }

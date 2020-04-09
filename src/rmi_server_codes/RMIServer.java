@@ -11,8 +11,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.json.JSONArray;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
+
 
 public class RMIServer extends UnicastRemoteObject implements RMIService {
 
@@ -60,6 +64,48 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 //					
 //		}
 		return responseBody;
+	}
+
+	@Override
+	public String loginValidator(String email, String password) throws RemoteException {
+				
+		JSONObject json = new JSONObject();
+		json.put("email", email);    
+		json.put("password", password); 
+		
+		String res = null;
+
+
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				
+		try {
+		    HttpPost request = new HttpPost("http://aq-visualizer.herokuapp.com/api/v1/admin/login");
+		    StringEntity params = new StringEntity(json.toString());
+		    request.addHeader("content-type", "application/json");
+		    request.setEntity(params);
+		    org.apache.http.HttpResponse response = httpClient.execute(request);
+
+		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK"));
+		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 400 Bad Request"));
+
+		    if (response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK")) {
+				res =  "success";
+			}
+		    else{
+		    	res =  "failed";
+			}
+		    
+		    
+		} catch (Exception ex) {
+		    ex.printStackTrace();
+		} finally {
+		    try {
+				httpClient.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return res;
 	}
 
 }

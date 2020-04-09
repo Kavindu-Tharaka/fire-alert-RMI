@@ -26,11 +26,16 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class DashBoardFrm extends JFrame {
 
 	private static JPanel contentPane;
 	private static String responseBody;
+	private static boolean isAdmin = false;
 	
 	/**
 	 * Launch the application.
@@ -39,7 +44,7 @@ public class DashBoardFrm extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					DashBoardFrm frame = new DashBoardFrm();
+					DashBoardFrm frame = new DashBoardFrm(isAdmin);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -58,8 +63,7 @@ public class DashBoardFrm extends JFrame {
 					
 				} catch (MalformedURLException | RemoteException | NotBoundException e) {
 					e.printStackTrace();
-				}	
-				
+				}
 			}
 		});
 	}
@@ -67,7 +71,8 @@ public class DashBoardFrm extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public DashBoardFrm() {
+	public DashBoardFrm(boolean isAdminn) {
+		isAdmin = isAdminn;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 542, 548);
 		
@@ -78,12 +83,23 @@ public class DashBoardFrm extends JFrame {
 		menuBar.add(mnNewMenu);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("Add New Sensor");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Menu Clicked");
+			}
+		});
 		mnNewMenu.add(mntmNewMenuItem);
+		mntmNewMenuItem.setVisible(isAdminn);
 		
 		JSeparator separator = new JSeparator();
 		mnNewMenu.add(separator);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Exit");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(EXIT_ON_CLOSE);
+			}
+		});
 		mnNewMenu.add(mntmNewMenuItem_1);
 		
 	
