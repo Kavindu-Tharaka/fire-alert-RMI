@@ -34,7 +34,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 	@Override
 	public String getAllSensorDetails() throws RemoteException {
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:8000/api/v1/sensors")).build();
+		HttpRequest request = HttpRequest.newBuilder(URI.create("https://aq-visualizer.herokuapp.com/api/v1/sensors/")).build();
 		return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 		.thenApply(HttpResponse::body)
 		.thenApply((responseBody) -> parse(responseBody))

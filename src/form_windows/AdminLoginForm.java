@@ -70,8 +70,9 @@ public class AdminLoginForm extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
-				DashboardForm dashboardForm = new DashboardForm();
-				dashboardForm.setVisible(true);
+				DashBoardFrm dashboardForm = new DashBoardFrm();
+				dashboardForm.main(null);
+				//dashboardForm.setVisible(true);
 			}
 		});
 		btnNewButton.setBounds(173, 180, 85, 21);
