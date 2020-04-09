@@ -26,6 +26,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.Timer;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
@@ -56,10 +58,27 @@ public class DashBoardFrm extends JFrame {
 					
 					service = (RMIService) Naming.lookup("rmi://localhost:5099/AirSensorService");
 					
-					//System.out.println  ("Add : " + service.add(2,2));
-					
-					responseBody = service.getAllSensorDetails();
-					populateSensorComponents(responseBody);
+					Timer t = new Timer(0, null);
+
+					t.addActionListener(new ActionListener() {
+
+					    @Override
+					    public void actionPerformed(ActionEvent e) {
+							//System.out.println  ("Add : " + service.add(2,2));
+							
+							try {
+								responseBody = service.getAllSensorDetails();
+							} catch (RemoteException e1) {
+								e1.printStackTrace();
+							}
+							populateSensorComponents(responseBody);
+					    }
+					});
+
+					t.setRepeats(true);
+					t.setDelay(30000); //repeat every 30 sec
+					t.start(); 
+
 					
 				} catch (MalformedURLException | RemoteException | NotBoundException e) {
 					e.printStackTrace();
@@ -121,6 +140,7 @@ public class DashBoardFrm extends JFrame {
 	
 	public static void populateSensorComponents(String responseBody) {
 		
+		contentPane.removeAll();
 		
 		JSONObject res = new JSONObject(responseBody);
 		JSONObject data = res.getJSONObject("data");
@@ -148,6 +168,8 @@ public class DashBoardFrm extends JFrame {
 			contentPane.add(sensorDetailComponent);	
 		}
 		
+		contentPane.validate();
+		contentPane.repaint();
 		
 
 //			for (int i = 1; i <= 1; i++) {
