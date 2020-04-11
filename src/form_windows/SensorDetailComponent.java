@@ -1,22 +1,38 @@
 package form_windows;
 
 import javax.swing.JPanel;
+
+import rmi_server_codes.RMIService;
+
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class SensorDetailComponent extends JPanel {
 
 	private String sensorId;
-	private String floorNumber;
+	private int floorNumber;
 	private String roomNumber;
 	private boolean status;
 	private int co2Level;
 	private int smokeLevel;
+	private JLabel lblsensorid;
+	private boolean isAdminn;
+	private JFrame frame;
+
 	
 //	public SensorDetailComponent(String floorNumber, String roomNumber, String status, int co2level, int smokelevel) {
 //		super();
@@ -27,7 +43,7 @@ public class SensorDetailComponent extends JPanel {
 //		this.smokelevel = smokelevel;
 //	}
 	
-	public SensorDetailComponent(String sensorId, String floorNumber, String roomNumber, boolean status, int co2level, int smokelevel) {
+	public SensorDetailComponent(String sensorId, int floorNumber, String roomNumber, boolean status, int co2level, int smokelevel, boolean isAdminn, JFrame frame) {
 		setLayout(null);
 		//setBounds(10, 10, 520, 107);
 		
@@ -37,9 +53,11 @@ public class SensorDetailComponent extends JPanel {
 		this.status = status;
 		this.co2Level = co2level;
 		this.smokeLevel = smokelevel;
+		this.isAdminn = isAdminn;
+		this.frame = frame;
 		
 		JPanel panel = new JPanel();
-		panel.setBackground(this.co2Level > 5 ? new Color(210,0,0) : new Color(0, 204, 0));
+		panel.setBackground(this.co2Level > 5 || this.smokeLevel > 5 ? new Color(210,0,0) : new Color(0, 204, 0));
 		panel.setBounds(0, 0, 88, 100);
 		add(panel);
 		panel.setLayout(null);
@@ -56,10 +74,10 @@ public class SensorDetailComponent extends JPanel {
 		lblNewLabel_5.setBounds(29, 76, 45, 13);
 		panel.add(lblNewLabel_5);
 		
-		JLabel lblfloornumber = new JLabel(this.floorNumber);
+		JLabel lblfloornumber = new JLabel(""+this.floorNumber);
 		lblfloornumber.setForeground(new Color(255, 255, 255));
 		lblfloornumber.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblfloornumber.setBounds(19, 0, 72, 34);
+		lblfloornumber.setBounds(36, 0, 38, 34);
 		panel.add(lblfloornumber);
 		
 		JLabel lblroomnumber = new JLabel(this.roomNumber);
@@ -104,25 +122,32 @@ public class SensorDetailComponent extends JPanel {
 		panel_1.add(lblsmokelevele);
 		
 		JButton btnNewButton = new JButton("");
+		btnNewButton.setVisible(isAdminn);
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				EditSensorForm editSensorForm = new EditSensorForm(lblfloornumber.getText(), lblroomnumber.getText(), lblsensorid.getText(), frame);
+				editSensorForm.setVisible(true);
+			}
+		});
 		btnNewButton.setBackground(Color.WHITE);
 		btnNewButton.setIcon(new ImageIcon(SensorDetailComponent.class.getResource("/img/edit.png")));
 		btnNewButton.setBounds(398, 10, 25, 25);
 		btnNewButton.setBorderPainted(false);
 		panel_1.add(btnNewButton);
 		
-		JLabel lblsensorid = new JLabel(this.sensorId);
+		lblsensorid = new JLabel(this.sensorId);
 		lblsensorid.setBounds(156, 144, 45, 13);
 		lblsensorid.setVisible(false);
 		add(lblsensorid);
 	}
 	
 
-	public String getFloorNumber() {
+	public int getFloorNumber() {
 		return floorNumber;
 	}
 
 
-	public void setFloorNumber(String floorNumber) {
+	public void setFloorNumber(int floorNumber) {
 		this.floorNumber = floorNumber;
 	}
 

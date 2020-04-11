@@ -114,7 +114,7 @@ public class AdminLoginForm extends JFrame {
 				System.out.println(result);
 				
 				if (result.equalsIgnoreCase("success")) {
-					
+					frame.dispose();
 					DashBoardFrm dashboardForm = new DashBoardFrm(true);
 					dashboardForm.main(null);
 				}

@@ -15,6 +15,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.Timer;
 
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,37 +34,30 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		registry.bind("AirSensorService", new RMIServer());
 		
 		
-//		Timer t = new Timer(0, null);
-//		String responseBody = "";
-//		
-//		t.addActionListener(new ActionListener() {
-//
-//		    @Override
-//		    public void actionPerformed(ActionEvent e) {
-//				//System.out.println  ("Add : " + service.add(2,2));
-//				
-//				try {
-//					responseBody = getAllSensorDetails();
-//				} catch (RemoteException e1) {
-//					e1.printStackTrace();
-//				}
-//		    }
-//		});
-//
-//		t.setRepeats(true);
-//		t.setDelay(5000); //repeat every 30 sec
-//		t.start(); 
+		Timer t = new Timer(0, null);
+		
+		t.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {				
+				try {
+					//checkStateRepeatedly();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+		    }
+		});
+
+		t.setRepeats(true);
+		t.setDelay(15000); //repeat every 15 sec
+		t.start(); 
 		
 	}
 	
 	protected RMIServer() throws RemoteException {
 		super();
 	}
-	
-    public int add(int a, int b) throws RemoteException {
-        System.out.println("Adding " + a + " and " + b + " in the Server");
-        return a+b;
-    }
+
     
 	@Override
 	public String getAllSensorDetails() throws RemoteException {
@@ -138,16 +132,16 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		return res;
 	}
 	
-	public String checkStateRepeatedly() {
+	public static void checkStateRepeatedly() {
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder(URI.create("https://aq-visualizer.herokuapp.com/api/v1/sensors/")).build();
-		return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+		client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 		.thenApply(HttpResponse::body)
 		.thenApply((responseBody) -> checkCo2Level(responseBody))
 		.join();
 	}
 
-	private String checkCo2Level(String responseBody) {
+	private static String checkCo2Level(String responseBody) {
 		
 		JSONObject res = new JSONObject(responseBody);
 		JSONObject data = res.getJSONObject("data");
@@ -162,16 +156,122 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 			int co2Level = lastReading.getInt("co2Level");
 			int smokeLevel = lastReading.getInt("smokeLevel");
 			String _id = obj.getString("_id");
-			String floor = obj.getString("floor");
-			String room = obj.getString("room");
-
+			
 			if (co2Level > 5) {
 				
+				JSONObject jsonReading = new JSONObject();
+				jsonReading.put("smokeLevel", smokeLevel); 
+				jsonReading.put("co2Level", co2Level); 
+				
+				JSONObject json = new JSONObject();
+				json.put("to", "kavindu.ktm@gmail.com");    
+				json.put("sensor", _id);    
+				json.put("reading", jsonReading);    
+
+
+				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+						
+				try {
+				    HttpPost request = new HttpPost("https://aq-visualizer.herokuapp.com/api/v1/email");
+				    StringEntity params = new StringEntity(json.toString());
+				    request.addHeader("content-type", "application/json");
+				    request.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857jfrJYuit57uo");
+				    request.setEntity(params);
+				    org.apache.http.HttpResponse response = httpClient.execute(request);
+
+				    
+				    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created") ? "Email has Sent" : "Email has not Sent");
+				    
+
+				} catch (Exception ex) {
+				    ex.printStackTrace();
+				} finally {
+				    try {
+						httpClient.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			
 		}
 		
 		return null;
+	}
+
+	@Override
+	public boolean addSensor(String id, int floor, String room) throws RemoteException {
+		
+		boolean res = false;
+		
+		JSONObject json = new JSONObject();
+		json.put("_id", id);    
+		json.put("floor", floor);    
+		json.put("room", room);    
+
+
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				
+		try {
+		    HttpPost request = new HttpPost("https://aq-visualizer.herokuapp.com/api/v1/sensors");
+		    StringEntity params = new StringEntity(json.toString());
+		    request.addHeader("content-type", "application/json");
+		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOTE2ZTA5YjM1MTU1MDAxN2NlYzJhOCIsImlhdCI6MTU4NjU4OTE5NCwiZXhwIjoxNTg5MTgxMTk0fQ.WjrtcFOBBL8dPVIGKZlCobAvaFuYrfB_J5cMWsEwcCE");
+		    request.setEntity(params);
+		    org.apache.http.HttpResponse response = httpClient.execute(request);
+
+		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created"));
+		    
+		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created");
+		    
+		} catch (Exception ex) {
+		    ex.printStackTrace();
+		} finally {
+		    try {
+				httpClient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return res;
+	}
+
+	@Override
+	public boolean editSensor(String id, int floor, String room) throws RemoteException {
+
+		boolean res = false;
+		
+		JSONObject json = new JSONObject();
+		json.put("_id", id);    
+		//json.put("activated", activated);    
+		json.put("floor", floor);    
+		json.put("room", room);     
+
+
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				
+		try {
+		    HttpPatch request = new HttpPatch("https://aq-visualizer.herokuapp.com/api/v1/sensors/"+id);
+		    StringEntity params = new StringEntity(json.toString());
+		    request.addHeader("content-type", "application/json");
+		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOTE2ZTA5YjM1MTU1MDAxN2NlYzJhOCIsImlhdCI6MTU4NjU4OTE5NCwiZXhwIjoxNTg5MTgxMTk0fQ.WjrtcFOBBL8dPVIGKZlCobAvaFuYrfB_J5cMWsEwcCE");
+		    request.setEntity(params);
+		    org.apache.http.HttpResponse response = httpClient.execute(request);
+
+		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK"));
+		    
+		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK");
+		    
+		} catch (Exception ex) {
+		    System.out.println(ex);
+		} finally {
+		    try {
+				httpClient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return res;
 	}
 	
 

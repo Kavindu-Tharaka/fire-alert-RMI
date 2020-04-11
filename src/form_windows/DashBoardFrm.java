@@ -37,6 +37,7 @@ public class DashBoardFrm extends JFrame {
 
 	private static JPanel contentPane;
 	private static String responseBody;
+	private static DashBoardFrm frame;
 	private static boolean isAdmin = false;
 	
 	/**
@@ -46,7 +47,7 @@ public class DashBoardFrm extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					DashBoardFrm frame = new DashBoardFrm(isAdmin);
+					frame = new DashBoardFrm(isAdmin);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -104,7 +105,9 @@ public class DashBoardFrm extends JFrame {
 		JMenuItem mntmNewMenuItem = new JMenuItem("Add New Sensor");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Menu Clicked");
+				frame.dispose();
+				AddSensorForm addSensorForm = new AddSensorForm();
+				addSensorForm.setVisible(true);
 			}
 		});
 		mnNewMenu.add(mntmNewMenuItem);
@@ -158,12 +161,12 @@ public class DashBoardFrm extends JFrame {
 
 			boolean activated = obj.getBoolean("activated");
 			String _id = obj.getString("_id");
-			String floor = obj.getString("floor");
+			int floor = obj.getInt("floor");
 			String room = obj.getString("room");
 			
 			System.out.println("activated : "+activated + "\n_id : "+_id + "\nfloor : "+floor + "\nroom : " + room +"\nco2Level : "+ co2Level +"\nsmokeLevel : " +smokeLevel+  "\ntime : " + time + "\n\n");
 					
-			SensorDetailComponent sensorDetailComponent = new SensorDetailComponent(_id, floor, room, activated, co2Level, smokeLevel);
+			SensorDetailComponent sensorDetailComponent = new SensorDetailComponent(_id, floor, room, activated, co2Level, smokeLevel, isAdmin, frame);
 			sensorDetailComponent.setVisible(true);
 			contentPane.add(sensorDetailComponent);	
 		}
