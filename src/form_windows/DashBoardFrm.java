@@ -164,7 +164,7 @@ public class DashBoardFrm extends JFrame {
 			int floor = obj.getInt("floor");
 			String room = obj.getString("room");
 			
-			System.out.println("activated : "+activated + "\n_id : "+_id + "\nfloor : "+floor + "\nroom : " + room +"\nco2Level : "+ co2Level +"\nsmokeLevel : " +smokeLevel+  "\ntime : " + time + "\n\n");
+			//System.out.println("activated : "+activated + "\n_id : "+_id + "\nfloor : "+floor + "\nroom : " + room +"\nco2Level : "+ co2Level +"\nsmokeLevel : " +smokeLevel+  "\ntime : " + time + "\n\n");
 					
 			SensorDetailComponent sensorDetailComponent = new SensorDetailComponent(_id, floor, room, activated, co2Level, smokeLevel, isAdmin, frame);
 			sensorDetailComponent.setVisible(true);

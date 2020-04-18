@@ -103,7 +103,7 @@ public class EditSensorForm extends JDialog {
 						}
 						
 						if (res) {
-							//dialog.dispose();
+							
 							frame.dispose();
 							DashBoardFrm dashboardForm = new DashBoardFrm(true);
 							dashboardForm.main(null);

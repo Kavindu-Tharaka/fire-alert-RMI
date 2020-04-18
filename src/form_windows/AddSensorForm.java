@@ -29,7 +29,6 @@ public class AddSensorForm extends JDialog {
 	private JTextField txtfloorno;
 	private JTextField txtroomno;
 	private boolean res;
-	private static AddSensorForm dialog;
 	
 
 	/**
@@ -37,7 +36,7 @@ public class AddSensorForm extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			dialog = new AddSensorForm();
+			AddSensorForm dialog = new AddSensorForm();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -124,7 +123,7 @@ public class AddSensorForm extends JDialog {
 						}
 						
 						if (res) {
-							//dialog.dispose();
+							
 							DashBoardFrm dashboardForm = new DashBoardFrm(true);
 							dashboardForm.main(null);
 						}
