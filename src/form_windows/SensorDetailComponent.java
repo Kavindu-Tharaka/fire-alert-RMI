@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.SwingConstants;
 
 public class SensorDetailComponent extends JPanel {
 
@@ -130,10 +131,48 @@ public class SensorDetailComponent extends JPanel {
 			}
 		});
 		btnNewButton.setBackground(Color.WHITE);
-		btnNewButton.setIcon(new ImageIcon(SensorDetailComponent.class.getResource("/img/edit.png")));
-		btnNewButton.setBounds(398, 10, 25, 25);
+		btnNewButton.setIcon(new ImageIcon(SensorDetailComponent.class.getResource("/img/edit_.png")));
+		btnNewButton.setBounds(359, 10, 25, 25);
 		btnNewButton.setBorderPainted(false);
 		panel_1.add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("");
+		btnNewButton_1.setVisible(isAdminn);
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				RMIService service;
+				boolean res = false;
+				try {
+					
+					service = (RMIService) Naming.lookup("rmi://localhost:5099/AirSensorService");
+							
+					try {
+						res = service.deleteSensor(lblsensorid.getText());								
+						
+					} catch (RemoteException e1) {
+						e1.printStackTrace();
+					}
+				} 
+				catch (MalformedURLException | RemoteException | NotBoundException ex) {
+					ex.printStackTrace();
+				}
+				
+				if (res) {
+					frame.dispose();
+					DashBoardFrm dashboardForm = new DashBoardFrm(true);
+					dashboardForm.main(null);
+				}
+				else {
+					System.out.println("Error");
+				}
+			}
+		});
+		btnNewButton_1.setBackground(Color.WHITE);
+		btnNewButton_1.setIcon(new ImageIcon(SensorDetailComponent.class.getResource("/img/delete.png")));
+		btnNewButton_1.setBounds(394, 10, 29, 25);
+		btnNewButton_1.setBorderPainted(false);
+		panel_1.add(btnNewButton_1);
 		
 		lblsensorid = new JLabel(this.sensorId);
 		lblsensorid.setBounds(156, 144, 45, 13);

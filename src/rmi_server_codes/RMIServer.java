@@ -15,6 +15,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.Timer;
 
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -41,7 +42,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {				
 				try {
-					checkStateRepeatedly();
+					//checkStateRepeatedly();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -273,6 +274,31 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		}
 		return res;
 	}
-	
 
+	@Override
+	public boolean deleteSensor(String id) throws RemoteException {
+
+		boolean res = false;
+		
+		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		
+		try {
+		    HttpDelete request = new HttpDelete("https://fire-alert-solution.herokuapp.com/api/v1/sensors/"+id);
+		    request.addHeader("content-type", "application/json");
+		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWFhNzliNDIyZmQ0MDAxNzQ2ZGIyOCIsImlhdCI6MTU4NzE5Mzc1NiwiZXhwIjoxNTg5Nzg1NzU2fQ.JL1cjudq9XKjrARDXOerPsv1qdUhwtD7m2J464uAQmk");
+		    org.apache.http.HttpResponse response = httpClient.execute(request);
+		    
+		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 204 No Content");
+		}
+		 catch (Exception ex) {
+			    System.out.println(ex);
+			} finally {
+			    try {
+					httpClient.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		return res;
+	}
 }

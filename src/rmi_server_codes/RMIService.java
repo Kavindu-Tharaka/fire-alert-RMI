@@ -12,6 +12,8 @@ public interface RMIService extends Remote{
 	public boolean addSensor(String id, int floor, String room) throws RemoteException;
 	
 	public boolean editSensor(String id, int floor, String room) throws RemoteException;
+
+	public boolean deleteSensor(String id) throws RemoteException;
 	
 	
 }
