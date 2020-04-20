@@ -50,7 +50,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		});
 
 		t.setRepeats(true);
-		t.setDelay(15000); //repeat every 15 sec
+		t.setDelay(5000); //repeat every 15 sec
 		t.start(); 
 		
 	}
@@ -72,22 +72,6 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 	
 	public static String parse(String responseBody) {
 		
-//		JSONObject res = new JSONObject(responseBody);
-//		JSONObject data = res.getJSONObject("data");
-//		JSONArray sensors = data.getJSONArray("sensors");
-//		
-//		for (int i = 0; i < sensors.length(); i++) {
-//			
-//			JSONObject obj  = sensors.getJSONObject(i);
-//					
-//			boolean activated = obj.getBoolean("activated");
-//			String _id = obj.getString("_id");
-//			String floor = obj.getString("floor");
-//			String room = obj.getString("room");
-//			
-//			System.out.println("activated : "+activated + "\n_id : "+_id + "\nfloor : "+floor + "\nroom : " + room +"\n\n");
-//					
-//		}
 		return responseBody;
 	}
 
@@ -100,7 +84,6 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		
 		String res = null;
 
-
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 				
 		try {
@@ -109,9 +92,6 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		    request.addHeader("content-type", "application/json");
 		    request.setEntity(params);
 		    org.apache.http.HttpResponse response = httpClient.execute(request);
-
-		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK"));
-		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 400 Bad Request"));
 
 		    if (response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK")) {
 				res =  "success";
@@ -160,28 +140,47 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 			
 			if (co2Level > 5 || smokeLevel > 5) {
 				
-				JSONObject jsonReading = new JSONObject();
-				jsonReading.put("smokeLevel", smokeLevel); 
-				jsonReading.put("co2Level", co2Level); 
+				//create JSON object to send with Email API call
+				JSONObject jsonReadingEmail = new JSONObject();
+				jsonReadingEmail.put("smokeLevel", smokeLevel); 
+				jsonReadingEmail.put("co2Level", co2Level); 
 				
-				JSONObject json = new JSONObject();
-				json.put("to", "kavindu.ktm@gmail.com");    
-				json.put("sensor", _id);    
-				json.put("reading", jsonReading);    
+				JSONObject jsonEmail = new JSONObject();
+				jsonEmail.put("to", "kavindu.ktm@gmail.com");    
+				jsonEmail.put("sensor", _id);    
+				jsonEmail.put("reading", jsonReadingEmail);    
 
-
+				//create JSON object to send with SMS API call
+				JSONObject jsonReadingSms = new JSONObject();
+				jsonReadingSms.put("smokeLevel", smokeLevel); 
+				jsonReadingSms.put("co2Level", co2Level); 
+				
+				JSONObject jsonSms = new JSONObject();
+				jsonSms.put("to", "+94711334645");    
+				jsonSms.put("sensor", _id);    
+				jsonSms.put("reading", jsonReadingSms);
+				
+				
 				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 						
 				try {
-				    HttpPost request = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/email");
-				    StringEntity params = new StringEntity(json.toString());
-				    request.addHeader("content-type", "application/json");
-				    request.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857jfrJYuit57uo");
-				    request.setEntity(params);
-				    org.apache.http.HttpResponse response = httpClient.execute(request);
+				    HttpPost requestEmail = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/email");
+				    StringEntity paramsEmail = new StringEntity(jsonEmail.toString());
+				    requestEmail.addHeader("content-type", "application/json");
+				    requestEmail.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857yfrJYuit57vf");
+				    requestEmail.setEntity(paramsEmail);
+				    org.apache.http.HttpResponse responseEmail = httpClient.execute(requestEmail);
 
+				    HttpPost requestSms = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/sms");
+				    StringEntity paramsSms = new StringEntity(jsonSms.toString());
+				    requestSms.addHeader("content-type", "application/json");
+				    requestSms.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857yfrJYuit57vf");
+				    requestSms.setEntity(paramsSms);
+				    org.apache.http.HttpResponse responseSms = httpClient.execute(requestSms);
 				    
-				    //System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created") ? "Email has Sent" : "Email has not Sent");
+				    
+				    System.out.println(responseEmail.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created") ? "Email has Sent" : "Email has not Sent");
+				    System.out.println(responseSms.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created") ? "Sms has Sent" : "Sms has not Sent");
 				    
 
 				} catch (Exception ex) {
@@ -216,7 +215,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		    HttpPost request = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/sensors");
 		    StringEntity params = new StringEntity(json.toString());
 		    request.addHeader("content-type", "application/json");
-		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWFhNzliNDIyZmQ0MDAxNzQ2ZGIyOCIsImlhdCI6MTU4NzE5Mzc1NiwiZXhwIjoxNTg5Nzg1NzU2fQ.JL1cjudq9XKjrARDXOerPsv1qdUhwtD7m2J464uAQmk");
+		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
 		    request.setEntity(params);
 		    org.apache.http.HttpResponse response = httpClient.execute(request);
 
@@ -255,7 +254,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		    HttpPatch request = new HttpPatch("https://fire-alert-solution.herokuapp.com/api/v1/sensors/"+id);
 		    StringEntity params = new StringEntity(json.toString());
 		    request.addHeader("content-type", "application/json");
-		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWFhNzliNDIyZmQ0MDAxNzQ2ZGIyOCIsImlhdCI6MTU4NzE5Mzc1NiwiZXhwIjoxNTg5Nzg1NzU2fQ.JL1cjudq9XKjrARDXOerPsv1qdUhwtD7m2J464uAQmk");
+		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
 		    request.setEntity(params);
 		    org.apache.http.HttpResponse response = httpClient.execute(request);
 
@@ -285,7 +284,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		try {
 		    HttpDelete request = new HttpDelete("https://fire-alert-solution.herokuapp.com/api/v1/sensors/"+id);
 		    request.addHeader("content-type", "application/json");
-		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWFhNzliNDIyZmQ0MDAxNzQ2ZGIyOCIsImlhdCI6MTU4NzE5Mzc1NiwiZXhwIjoxNTg5Nzg1NzU2fQ.JL1cjudq9XKjrARDXOerPsv1qdUhwtD7m2J464uAQmk");
+		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
 		    org.apache.http.HttpResponse response = httpClient.execute(request);
 		    
 		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 204 No Content");
