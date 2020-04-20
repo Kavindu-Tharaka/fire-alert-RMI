@@ -29,7 +29,6 @@ public class AddSensorForm extends JDialog {
 	private JTextField txtfloorno;
 	private JTextField txtroomno;
 	private boolean res;
-	
 
 	/**
 	 * Launch the application.
@@ -53,39 +52,39 @@ public class AddSensorForm extends JDialog {
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
-		
+
 		JLabel lblNewLabel = new JLabel("ID (Serial No. on Sensor)");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblNewLabel.setBounds(23, 33, 190, 28);
 		contentPanel.add(lblNewLabel);
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Floor No.");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblNewLabel_1.setBounds(23, 75, 127, 28);
 		contentPanel.add(lblNewLabel_1);
-		
+
 		JLabel lblNewLabel_2 = new JLabel("Room No.");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblNewLabel_2.setBounds(23, 124, 149, 20);
 		contentPanel.add(lblNewLabel_2);
-		
+
 		txtsensorid = new JTextField();
 		txtsensorid.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		txtsensorid.setBounds(230, 35, 216, 26);
 		contentPanel.add(txtsensorid);
 		txtsensorid.setColumns(10);
-		
+
 		txtfloorno = new JTextField();
 		txtfloorno.setBounds(230, 78, 216, 28);
 		contentPanel.add(txtfloorno);
 		txtfloorno.setColumns(10);
-		
+
 		txtroomno = new JTextField();
 		txtroomno.setBounds(230, 123, 216, 28);
 		contentPanel.add(txtroomno);
 		txtroomno.setColumns(10);
-		
-		JLabel lblerromsg = new JLabel("Same ID " + txtsensorid.getText() +" is already exist!");
+
+		JLabel lblerromsg = new JLabel("Same ID " + txtsensorid.getText() + " is already exist!");
 		lblerromsg.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblerromsg.setForeground(Color.RED);
 		lblerromsg.setBounds(153, 161, 204, 19);
@@ -99,38 +98,36 @@ public class AddSensorForm extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						
+
 						String id = txtsensorid.getText();
 						int floor = Integer.parseInt(txtfloorno.getText());
 						String room = txtroomno.getText();
-						
-						
+
 						RMIService service;
-						
+
 						try {
-							
+							//find the service
 							service = (RMIService) Naming.lookup("rmi://localhost:5099/AirSensorService");
-									
+
 							try {
-								res = service.addSensor(id, floor, room);								
-								
+								//invoke remote method and assign to a variable
+								res = service.addSensor(id, floor, room);
+
 							} catch (RemoteException e1) {
 								e1.printStackTrace();
 							}
-						} 
-						catch (MalformedURLException | RemoteException | NotBoundException ex) {
+						} catch (MalformedURLException | RemoteException | NotBoundException ex) {
 							ex.printStackTrace();
 						}
-						
+
 						if (res) {
-							
+
 							DashBoardFrm dashboardForm = new DashBoardFrm(true);
 							dashboardForm.main(null);
-						}
-						else {
+						} else {
 							lblerromsg.setVisible(true);
 						}
-						
+
 					}
 				});
 				okButton.setActionCommand("OK");

@@ -1,4 +1,5 @@
 package form_windows;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -34,6 +35,7 @@ public class AdminLoginForm extends JFrame {
 	private JTextField txtemail;
 	private JTextField txtpassword;
 	private static AdminLoginForm frame;
+
 	/**
 	 * Launch the application.
 	 */
@@ -60,65 +62,67 @@ public class AdminLoginForm extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		JLabel lblNewLabel = new JLabel("Email");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblNewLabel.setBounds(34, 159, 77, 16);
 		contentPane.add(lblNewLabel);
-		
+
 		JLabel lblNewLabel_1 = new JLabel("Password");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblNewLabel_1.setBounds(34, 217, 85, 22);
 		contentPane.add(lblNewLabel_1);
-		
+
 		JLabel lblerror = new JLabel("Invalid Credentials. Try Again.");
 		lblerror.setForeground(Color.RED);
 		lblerror.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblerror.setBounds(89, 382, 185, 22);
 		contentPane.add(lblerror);
-		lblerror.setVisible(false); //error msg will not be visible at the beginning
-		
+		lblerror.setVisible(false); // error msg will not be visible at the beginning
+
 		txtemail = new JTextField();
 		txtemail.setFont(new Font("Tahoma", Font.ITALIC, 17));
 		txtemail.setBounds(121, 154, 205, 27);
 		contentPane.add(txtemail);
 		txtemail.setColumns(10);
-		
+
 		txtpassword = new JTextField();
 		txtpassword.setFont(new Font("Tahoma", Font.ITALIC, 17));
 		txtpassword.setBounds(121, 215, 205, 27);
 		contentPane.add(txtpassword);
 		txtpassword.setColumns(10);
-		
+
 		JButton btnsignin = new JButton("Sign In");
 		btnsignin.setIcon(new ImageIcon(AdminLoginForm.class.getResource("/img/signin_.png")));
 		btnsignin.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		btnsignin.addActionListener(new ActionListener() {
+			// add event listner to the button
 			public void actionPerformed(ActionEvent e) {
-		
+
 				String email = txtemail.getText();
 				String password = txtpassword.getText();
-				
-				
+
 				RMIService service;
 				String result = null;
 				try {
-					
-					service = (RMIService) Naming.lookup("rmi://localhost:5099/AirSensorService");					
+					// find the remote service
+					service = (RMIService) Naming.lookup("rmi://localhost:5099/AirSensorService");
+					// invoke the remote method
 					result = service.loginValidator(email, password);
-					
+
 				} catch (MalformedURLException | RemoteException | NotBoundException ex) {
 					ex.printStackTrace();
 				}
-				
-				System.out.println(result);
-				
+
+				System.out.println(result); // write the result on the console
+
 				if (result.equalsIgnoreCase("success")) {
+					// if valid Admin credential, open the dashboard
 					frame.dispose();
 					DashBoardFrm dashboardForm = new DashBoardFrm(true);
 					dashboardForm.main(null);
-				}
-				else {
+				} else {
+					// if invalid Admin credential, display error msg
 					lblerror.setVisible(true);
 				}
 
@@ -126,7 +130,7 @@ public class AdminLoginForm extends JFrame {
 		});
 		btnsignin.setBounds(100, 296, 154, 43);
 		contentPane.add(btnsignin);
-		
+
 		JLabel lblNewLabel_2 = new JLabel("Admin Login");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		lblNewLabel_2.setIcon(new ImageIcon(AdminLoginForm.class.getResource("/img/admin.png")));

@@ -27,13 +27,13 @@ public class EditSensorForm extends JDialog {
 	private boolean res;
 	private JTextField txtFloorNo;
 	private JTextField txtRoomNo;
-	
+
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		try {
-			EditSensorForm dialog = new EditSensorForm(null,null,null, null);
+			EditSensorForm dialog = new EditSensorForm(null, null, null, null);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -86,31 +86,29 @@ public class EditSensorForm extends JDialog {
 					public void actionPerformed(ActionEvent e) {
 
 						RMIService service;
-						
+
 						try {
-							
+							//find the service
 							service = (RMIService) Naming.lookup("rmi://localhost:5099/AirSensorService");
-									
+
 							try {
-								res = service.editSensor(lblsensorid, Integer.parseInt(txtFloorNo.getText()), txtRoomNo.getText());								
-								
+								//invoke remote method and assign to a variable
+								res = service.editSensor(lblsensorid, Integer.parseInt(txtFloorNo.getText()),
+										txtRoomNo.getText());
+
 							} catch (RemoteException e1) {
 								e1.printStackTrace();
 							}
-						} 
-						catch (MalformedURLException | RemoteException | NotBoundException ex) {
+						} catch (MalformedURLException | RemoteException | NotBoundException ex) {
 							ex.printStackTrace();
 						}
-						
+
 						if (res) {
-							
 							frame.dispose();
 							DashBoardFrm dashboardForm = new DashBoardFrm(true);
 							dashboardForm.main(null);
-							
-						}
-						else {
-							//lblerromsg.setVisible(true);
+
+						} else {
 							System.out.println("Error");
 						}
 					}

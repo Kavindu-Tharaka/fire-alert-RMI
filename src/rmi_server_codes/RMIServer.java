@@ -26,85 +26,88 @@ import org.json.JSONObject;
 
 import form_windows.SensorDetailComponent;
 
-
 public class RMIServer extends UnicastRemoteObject implements RMIService {
 
 	public static void main(String[] args) throws RemoteException, AlreadyBoundException, IOException {
 
 		Registry registry = LocateRegistry.createRegistry(5099);
 		registry.bind("AirSensorService", new RMIServer());
-		
-		
+
 		Timer t = new Timer(0, null);
-		
+
 		t.addActionListener(new ActionListener() {
 
-		    @Override
-		    public void actionPerformed(ActionEvent e) {				
+			@Override
+			public void actionPerformed(ActionEvent e) {
 				try {
-					//checkStateRepeatedly();
+					// checkStateRepeatedly();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
-		    }
+			}
 		});
 
 		t.setRepeats(true);
-		t.setDelay(5000); //repeat every 15 sec
-		t.start(); 
-		
+		t.setDelay(5000); // repeat every 15 sec
+		t.start();
+
 	}
-	
+
 	protected RMIServer() throws RemoteException {
 		super();
 	}
 
-    
+	/*
+	 * used to retrieve sensor readings and other details of all sensors
+	 */
 	@Override
 	public String getAllSensorDetails() throws RemoteException {
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder(URI.create("https://fire-alert-solution.herokuapp.com/api/v1/sensors/")).build();
-		return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-		.thenApply(HttpResponse::body)
-		.thenApply((responseBody) -> parse(responseBody))
-		.join();
+		// prepare a HTTP request to send to API
+		HttpRequest request = HttpRequest
+				.newBuilder(URI.create("https://fire-alert-solution.herokuapp.com/api/v1/sensors/")).build();
+		return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body)
+				.thenApply((responseBody) -> parse(responseBody)).join();
 	}
-	
+
 	public static String parse(String responseBody) {
-		
 		return responseBody;
 	}
 
+	/*
+	 * used to retrieve authenticate Admin login credentials
+	 */
 	@Override
 	public String loginValidator(String email, String password) throws RemoteException {
-				
+
 		JSONObject json = new JSONObject();
-		json.put("email", email);    
-		json.put("password", password); 
-		
+		json.put("email", email);
+		json.put("password", password);
+
 		String res = null;
 
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-				
-		try {
-		    HttpPost request = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/admin/login");
-		    StringEntity params = new StringEntity(json.toString());
-		    request.addHeader("content-type", "application/json");
-		    request.setEntity(params);
-		    org.apache.http.HttpResponse response = httpClient.execute(request);
 
-		    if (response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK")) {
-				res =  "success";
+		try {
+			// prepare a HTTP request to send to API
+			HttpPost request = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/admin/login");
+			StringEntity params = new StringEntity(json.toString());
+			// add headers to the request
+			request.addHeader("content-type", "application/json");
+			request.setEntity(params);
+			org.apache.http.HttpResponse response = httpClient.execute(request);
+
+			// check the response
+			if (response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK")) {
+				res = "success";
+			} else {
+				res = "failed";
 			}
-		    else{
-		    	res =  "failed";
-			}
-		    
-		    
+
 		} catch (Exception ex) {
-		    ex.printStackTrace();
+			ex.printStackTrace();
 		} finally {
-		    try {
+			try {
 				httpClient.close();
 			} catch (IOException ex) {
 				ex.printStackTrace();
@@ -112,81 +115,91 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		}
 		return res;
 	}
-	
+
+	/*
+	 * used to check co2 and smoke levels repeatedly
+	 * 
+	 */
 	public static void checkStateRepeatedly() {
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder(URI.create("https://fire-alert-solution.herokuapp.com/api/v1/sensors/")).build();
-		client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-		.thenApply(HttpResponse::body)
-		.thenApply((responseBody) -> checkCo2Level(responseBody))
-		.join();
+		// prepare a HTTP request to send to API
+		HttpRequest request = HttpRequest
+				.newBuilder(URI.create("https://fire-alert-solution.herokuapp.com/api/v1/sensors/")).build();
+		client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body)
+				.thenApply((responseBody) -> checkCo2andSmokeLevel(responseBody)).join();
 	}
 
-	private static String checkCo2Level(String responseBody) {
-		
+	private static String checkCo2andSmokeLevel(String responseBody) {
+
 		JSONObject res = new JSONObject(responseBody);
 		JSONObject data = res.getJSONObject("data");
 		JSONArray sensors = data.getJSONArray("sensors");
-		
+
 		for (int i = 0; i < sensors.length(); i++) {
-			
-			JSONObject obj  = sensors.getJSONObject(i);
-			
+
+			JSONObject obj = sensors.getJSONObject(i);
+
 			JSONObject lastReading = obj.getJSONObject("lastReading");
-			
+
 			int co2Level = lastReading.getInt("co2Level");
 			int smokeLevel = lastReading.getInt("smokeLevel");
 			String _id = obj.getString("_id");
-			
+
 			if (co2Level > 5 || smokeLevel > 5) {
-				
-				//create JSON object to send with Email API call
+
+				// create JSON object to send with Email API call
 				JSONObject jsonReadingEmail = new JSONObject();
-				jsonReadingEmail.put("smokeLevel", smokeLevel); 
-				jsonReadingEmail.put("co2Level", co2Level); 
-				
+				jsonReadingEmail.put("smokeLevel", smokeLevel);
+				jsonReadingEmail.put("co2Level", co2Level);
+
 				JSONObject jsonEmail = new JSONObject();
-				jsonEmail.put("to", "kavindu.ktm@gmail.com");    
-				jsonEmail.put("sensor", _id);    
-				jsonEmail.put("reading", jsonReadingEmail);    
+				jsonEmail.put("to", "kavindu.ktm@gmail.com");
+				jsonEmail.put("sensor", _id);
+				jsonEmail.put("reading", jsonReadingEmail);
 
-				//create JSON object to send with SMS API call
+				// create JSON object to send with SMS API call
 				JSONObject jsonReadingSms = new JSONObject();
-				jsonReadingSms.put("smokeLevel", smokeLevel); 
-				jsonReadingSms.put("co2Level", co2Level); 
-				
-				JSONObject jsonSms = new JSONObject();
-				jsonSms.put("to", "+94711334645");    
-				jsonSms.put("sensor", _id);    
-				jsonSms.put("reading", jsonReadingSms);
-				
-				
-				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-						
-				try {
-				    HttpPost requestEmail = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/email");
-				    StringEntity paramsEmail = new StringEntity(jsonEmail.toString());
-				    requestEmail.addHeader("content-type", "application/json");
-				    requestEmail.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857yfrJYuit57vf");
-				    requestEmail.setEntity(paramsEmail);
-				    org.apache.http.HttpResponse responseEmail = httpClient.execute(requestEmail);
+				jsonReadingSms.put("smokeLevel", smokeLevel);
+				jsonReadingSms.put("co2Level", co2Level);
 
-				    HttpPost requestSms = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/sms");
-				    StringEntity paramsSms = new StringEntity(jsonSms.toString());
-				    requestSms.addHeader("content-type", "application/json");
-				    requestSms.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857yfrJYuit57vf");
-				    requestSms.setEntity(paramsSms);
-				    org.apache.http.HttpResponse responseSms = httpClient.execute(requestSms);
-				    
-				    
-				    System.out.println(responseEmail.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created") ? "Email has Sent" : "Email has not Sent");
-				    System.out.println(responseSms.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created") ? "Sms has Sent" : "Sms has not Sent");
-				    
+				JSONObject jsonSms = new JSONObject();
+				jsonSms.put("to", "+94711334645");
+				jsonSms.put("sensor", _id);
+				jsonSms.put("reading", jsonReadingSms);
+
+				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+				try {
+					// prepare a HTTP request to send to API to send email
+					HttpPost requestEmail = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/email");
+					StringEntity paramsEmail = new StringEntity(jsonEmail.toString());
+					// add headers to the request
+					requestEmail.addHeader("content-type", "application/json");
+					requestEmail.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857yfrJYuit57vf");
+					requestEmail.setEntity(paramsEmail);
+					org.apache.http.HttpResponse responseEmail = httpClient.execute(requestEmail);
+
+					// prepare a HTTP request to send to API to send SMS
+					HttpPost requestSms = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/sms");
+					StringEntity paramsSms = new StringEntity(jsonSms.toString());
+					// add headers to the request
+					requestSms.addHeader("content-type", "application/json");
+					requestSms.addHeader("Authorization", "agfYjhdioJK5ghiH46dHr8gfg857yfrJYuit57vf");
+					requestSms.setEntity(paramsSms);
+					org.apache.http.HttpResponse responseSms = httpClient.execute(requestSms);
+
+					// check the responses
+					System.out.println(responseEmail.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created")
+							? "Email has Sent"
+							: "Email has not Sent");
+					System.out.println(responseSms.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created")
+							? "Sms has Sent"
+							: "Sms has not Sent");
 
 				} catch (Exception ex) {
-				    ex.printStackTrace();
+					ex.printStackTrace();
 				} finally {
-				    try {
+					try {
 						httpClient.close();
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -194,39 +207,45 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
+	/*
+	 * used to register a new sensor
+	 */
 	@Override
 	public boolean addSensor(String id, int floor, String room) throws RemoteException {
-		
-		boolean res = false;
-		
-		JSONObject json = new JSONObject();
-		json.put("_id", id);    
-		json.put("floor", floor);    
-		json.put("room", room);    
 
+		boolean res = false;
+
+		JSONObject json = new JSONObject();
+		json.put("_id", id);
+		json.put("floor", floor);
+		json.put("room", room);
 
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-				
-		try {
-		    HttpPost request = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/sensors");
-		    StringEntity params = new StringEntity(json.toString());
-		    request.addHeader("content-type", "application/json");
-		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
-		    request.setEntity(params);
-		    org.apache.http.HttpResponse response = httpClient.execute(request);
 
-		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created"));
-		    
-		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created");
-		    
+		try {
+			// prepare a HTTP request to send to API
+			HttpPost request = new HttpPost("https://fire-alert-solution.herokuapp.com/api/v1/sensors");
+			StringEntity params = new StringEntity(json.toString());
+			// add headers to the request
+			request.addHeader("content-type", "application/json");
+			request.addHeader("Authorization",
+					"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
+			request.setEntity(params);
+			org.apache.http.HttpResponse response = httpClient.execute(request);
+
+			System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created"));
+
+			// check the response
+			res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 201 Created");
+
 		} catch (Exception ex) {
-		    ex.printStackTrace();
+			ex.printStackTrace();
 		} finally {
-		    try {
+			try {
 				httpClient.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -236,36 +255,42 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		return res;
 	}
 
+	/*
+	 * used to edit existing sensor details
+	 */
 	@Override
 	public boolean editSensor(String id, int floor, String room) throws RemoteException {
 
 		boolean res = false;
-		
-		JSONObject json = new JSONObject();
-		json.put("_id", id);    
-		//json.put("activated", activated);    
-		json.put("floor", floor);    
-		json.put("room", room);     
 
+		JSONObject json = new JSONObject();
+		json.put("_id", id);
+		// json.put("activated", activated);
+		json.put("floor", floor);
+		json.put("room", room);
 
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-				
-		try {
-		    HttpPatch request = new HttpPatch("https://fire-alert-solution.herokuapp.com/api/v1/sensors/"+id);
-		    StringEntity params = new StringEntity(json.toString());
-		    request.addHeader("content-type", "application/json");
-		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
-		    request.setEntity(params);
-		    org.apache.http.HttpResponse response = httpClient.execute(request);
 
-		    System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK"));
-		    
-		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK");
-		    
+		try {
+			// prepare a HTTP request to send to API
+			HttpPatch request = new HttpPatch("https://fire-alert-solution.herokuapp.com/api/v1/sensors/" + id);
+			StringEntity params = new StringEntity(json.toString());
+			// add headers to the request
+			request.addHeader("content-type", "application/json");
+			request.addHeader("Authorization",
+					"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
+			request.setEntity(params);
+			org.apache.http.HttpResponse response = httpClient.execute(request);
+
+			System.out.println(response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK"));
+
+			// check the response
+			res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 200 OK");
+
 		} catch (Exception ex) {
-		    System.out.println(ex);
+			System.out.println(ex);
 		} finally {
-		    try {
+			try {
 				httpClient.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -274,30 +299,37 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		return res;
 	}
 
+	/*
+	 * used to delete existing sensor
+	 */
 	@Override
 	public boolean deleteSensor(String id) throws RemoteException {
 
 		boolean res = false;
-		
+
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		
+
 		try {
-		    HttpDelete request = new HttpDelete("https://fire-alert-solution.herokuapp.com/api/v1/sensors/"+id);
-		    request.addHeader("content-type", "application/json");
-		    request.addHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
-		    org.apache.http.HttpResponse response = httpClient.execute(request);
-		    
-		    res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 204 No Content");
-		}
-		 catch (Exception ex) {
-			    System.out.println(ex);
-			} finally {
-			    try {
-					httpClient.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			// prepare a HTTP request to send to API
+			HttpDelete request = new HttpDelete("https://fire-alert-solution.herokuapp.com/api/v1/sensors/" + id);
+			// add headers to the request
+			request.addHeader("content-type", "application/json");
+			request.addHeader("Authorization",
+					"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
+			org.apache.http.HttpResponse response = httpClient.execute(request);
+
+			// check the response
+			res = response.getStatusLine().toString().equalsIgnoreCase("HTTP/1.1 204 No Content");
+
+		} catch (Exception ex) {
+			System.out.println(ex);
+		} finally {
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+		}
 		return res;
 	}
 }
