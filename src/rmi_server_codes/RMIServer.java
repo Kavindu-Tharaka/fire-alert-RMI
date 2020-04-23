@@ -48,7 +48,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		});
 
 		t.setRepeats(true);
-		t.setDelay(5000); // repeat every 15 sec
+		t.setDelay(5000); // repeat interval
 		t.start();
 
 	}
@@ -163,7 +163,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 				jsonReadingSms.put("co2Level", co2Level);
 
 				JSONObject jsonSms = new JSONObject();
-				jsonSms.put("to", "+94711334645");
+				jsonSms.put("to", "+94762210487");
 				jsonSms.put("sensor", _id);
 				jsonSms.put("reading", jsonReadingSms);
 

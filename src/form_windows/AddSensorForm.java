@@ -47,7 +47,7 @@ public class AddSensorForm extends JDialog {
 	 * Create the dialog.
 	 */
 	public AddSensorForm() {
-		setBounds(100, 100, 483, 258);
+		setBounds(250, 300, 483, 258);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

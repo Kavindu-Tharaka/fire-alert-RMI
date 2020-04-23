@@ -49,67 +49,68 @@ public class SensorDetailComponent extends JPanel {
 		JPanel panel = new JPanel();
 		// set Red color if the smoke or CO2 level goes above level 5
 		panel.setBackground(this.co2Level > 5 || this.smokeLevel > 5 ? new Color(210, 0, 0) : new Color(0, 204, 0));
-		panel.setBounds(0, 0, 88, 100);
+		panel.setBounds(0, 0, 175, 174);
 		add(panel);
 		panel.setLayout(null);
 
 		JLabel lblNewLabel_4 = new JLabel("Floor");
 		lblNewLabel_4.setForeground(new Color(255, 255, 255));
-		lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewLabel_4.setBounds(29, 31, 45, 13);
+		lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblNewLabel_4.setBounds(57, 59, 73, 27);
 		panel.add(lblNewLabel_4);
 
 		JLabel lblNewLabel_5 = new JLabel("Room");
 		lblNewLabel_5.setForeground(new Color(255, 255, 255));
-		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewLabel_5.setBounds(29, 76, 45, 13);
+		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblNewLabel_5.setBounds(57, 125, 81, 38);
 		panel.add(lblNewLabel_5);
 
 		JLabel lblfloornumber = new JLabel("" + this.floorNumber);
 		lblfloornumber.setForeground(new Color(255, 255, 255));
-		lblfloornumber.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblfloornumber.setBounds(36, 0, 38, 34);
+		lblfloornumber.setFont(new Font("Tahoma", Font.BOLD, 35));
+		lblfloornumber.setBounds(63, 24, 38, 34);
 		panel.add(lblfloornumber);
 
 		JLabel lblroomnumber = new JLabel(this.roomNumber);
 		lblroomnumber.setForeground(new Color(255, 255, 255));
-		lblroomnumber.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblroomnumber.setBounds(19, 44, 81, 35);
+		lblroomnumber.setFont(new Font("Tahoma", Font.BOLD, 35));
+		lblroomnumber.setBounds(39, 97, 126, 35);
 		panel.add(lblroomnumber);
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(255, 255, 255));
-		panel_1.setBounds(87, 0, 433, 100);
+		panel_1.setBounds(176, 0, 542, 174);
 		add(panel_1);
 		panel_1.setLayout(null);
 
 		JLabel lblsensorstatus = new JLabel(this.status ? "Activated" : "Deactivated");
-		lblsensorstatus.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblsensorstatus.setBounds(10, 10, 93, 13);
+		lblsensorstatus.setForeground(this.status ? Color.black : Color.red);
+		lblsensorstatus.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		lblsensorstatus.setBounds(10, 10, 163, 25);
 		panel_1.add(lblsensorstatus);
 
-		JLabel lblNewLabel_2 = new JLabel("CO2");
+		JLabel lblNewLabel_2 = new JLabel("Smoke");
 		lblNewLabel_2.setForeground(Color.GRAY);
-		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewLabel_2.setBounds(101, 77, 45, 13);
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		lblNewLabel_2.setBounds(121, 121, 144, 35);
 		panel_1.add(lblNewLabel_2);
 
-		JLabel lblNewLabel_3 = new JLabel("Smoke");
+		JLabel lblNewLabel_3 = new JLabel("CO2");
 		lblNewLabel_3.setForeground(Color.GRAY);
-		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewLabel_3.setBounds(263, 77, 45, 13);
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		lblNewLabel_3.setBounds(318, 114, 119, 49);
 		panel_1.add(lblNewLabel_3);
 
-		JLabel lblco2level = new JLabel("" + this.co2Level);
+		JLabel lblco2level = new JLabel("" + this.smokeLevel);
 		lblco2level.setForeground(new Color(0, 102, 204));
-		lblco2level.setFont(new Font("Tahoma", Font.PLAIN, 45));
-		lblco2level.setBounds(101, 19, 73, 62);
+		lblco2level.setFont(new Font("Tahoma", Font.PLAIN, 65));
+		lblco2level.setBounds(166, 46, 73, 62);
 		panel_1.add(lblco2level);
 
-		JLabel lblsmokelevele = new JLabel("" + this.smokeLevel);
+		JLabel lblsmokelevele = new JLabel("" + this.co2Level);
 		lblsmokelevele.setForeground(new Color(0, 102, 204));
-		lblsmokelevele.setFont(new Font("Tahoma", Font.PLAIN, 45));
-		lblsmokelevele.setBounds(263, 19, 73, 62);
+		lblsmokelevele.setFont(new Font("Tahoma", Font.PLAIN, 65));
+		lblsmokelevele.setBounds(336, 46, 73, 62);
 		panel_1.add(lblsmokelevele);
 
 		JButton btnNewButton = new JButton("");
@@ -124,7 +125,7 @@ public class SensorDetailComponent extends JPanel {
 		});
 		btnNewButton.setBackground(Color.WHITE);
 		btnNewButton.setIcon(new ImageIcon(SensorDetailComponent.class.getResource("/img/edit_.png")));
-		btnNewButton.setBounds(359, 10, 25, 25);
+		btnNewButton.setBounds(446, 10, 25, 25);
 		btnNewButton.setBorderPainted(false);
 		panel_1.add(btnNewButton);
 
@@ -161,7 +162,7 @@ public class SensorDetailComponent extends JPanel {
 		});
 		btnNewButton_1.setBackground(Color.WHITE);
 		btnNewButton_1.setIcon(new ImageIcon(SensorDetailComponent.class.getResource("/img/delete.png")));
-		btnNewButton_1.setBounds(394, 10, 29, 25);
+		btnNewButton_1.setBounds(481, 10, 29, 25);
 		btnNewButton_1.setBorderPainted(false);
 		panel_1.add(btnNewButton_1);
 

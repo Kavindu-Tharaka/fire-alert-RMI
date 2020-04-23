@@ -45,7 +45,7 @@ public class EditSensorForm extends JDialog {
 	 * Create the dialog.
 	 */
 	public EditSensorForm(String lblfloornumber, String lblroomnumber, String lblsensorid, JFrame frame) {
-		setBounds(100, 100, 377, 233);
+		setBounds(350, 300, 377, 233);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

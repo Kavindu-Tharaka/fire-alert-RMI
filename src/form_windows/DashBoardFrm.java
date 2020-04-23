@@ -93,7 +93,7 @@ public class DashBoardFrm extends JFrame {
 	public DashBoardFrm(boolean isAdminn) {
 		isAdmin = isAdminn;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 542, 548);
+		setBounds(210, 0, 720, 1045);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
