@@ -40,7 +40,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					// checkStateRepeatedly();
+					checkStateRepeatedly();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -48,7 +48,11 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 		});
 
 		t.setRepeats(true);
+<<<<<<< HEAD
 		t.setDelay(5000); // repeat interval
+=======
+		t.setDelay(15000); // repeat every 15 sec
+>>>>>>> 5b6c2a3685b3121240495f20d844fd70dee30f73
 		t.start();
 
 	}
