@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.http.HttpResponse;
@@ -33,7 +34,7 @@ public class AdminLoginForm extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField txtemail;
-	private JTextField txtpassword;
+	private JPasswordField txtpassword;
 	private static AdminLoginForm frame;
 
 	/**
@@ -86,7 +87,7 @@ public class AdminLoginForm extends JFrame {
 		contentPane.add(txtemail);
 		txtemail.setColumns(10);
 
-		txtpassword = new JTextField();
+		txtpassword = new JPasswordField();
 		txtpassword.setFont(new Font("Tahoma", Font.ITALIC, 17));
 		txtpassword.setBounds(121, 215, 205, 27);
 		contentPane.add(txtpassword);

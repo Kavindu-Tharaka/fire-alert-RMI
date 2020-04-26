@@ -77,7 +77,7 @@ public class DashBoardFrm extends JFrame {
 					});
 
 					t.setRepeats(true);
-					t.setDelay(30000); // repeat every 30 sec
+					t.setDelay(5000); // repeat interval should be ==> t.setDelay(30000); 
 					t.start();
 
 				} catch (MalformedURLException | RemoteException | NotBoundException e) {
@@ -101,7 +101,7 @@ public class DashBoardFrm extends JFrame {
 		JMenu mnNewMenu = new JMenu("File");
 		menuBar.add(mnNewMenu);
 
-		JMenuItem mntmNewMenuItem = new JMenuItem("Add New Sensor");
+		JMenuItem mntmNewMenuItem = new JMenuItem("Register New Sensor");
 		// add event listner to menu item
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

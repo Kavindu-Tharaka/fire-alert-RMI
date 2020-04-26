@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
 
 public class WelcomeForm {
 
@@ -82,8 +83,9 @@ public class WelcomeForm {
 		frame.getContentPane().add(btnNewButton_1);
 
 		JLabel lblNewLabel_1 = new JLabel("");
-		lblNewLabel_1.setIcon(new ImageIcon(WelcomeForm.class.getResource("/img/logo_.png")));
-		lblNewLabel_1.setBounds(20, 79, 323, 112);
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1.setIcon(new ImageIcon(WelcomeForm.class.getResource("/img/logo.jpg")));
+		lblNewLabel_1.setBounds(21, 80, 324, 113);
 		frame.getContentPane().add(lblNewLabel_1);
 	}
 }
