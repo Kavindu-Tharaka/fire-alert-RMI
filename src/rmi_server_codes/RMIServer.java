@@ -315,6 +315,7 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 			// prepare a HTTP request to send to API
 			HttpDelete request = new HttpDelete("https://fire-alert-solution.herokuapp.com/api/v1/sensors/" + id);
 			// add headers to the request
+			//here we add existing jwt
 			request.addHeader("content-type", "application/json");
 			request.addHeader("Authorization",
 					"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWRiYzlmZTE3NTBiMDAxN2Q1OGRiOSIsImlhdCI6MTU4NzM5NTc0NCwiZXhwIjoxNTg5OTg3NzQ0fQ.4MZXhOVMVkiMboNhoGyiCDeuY6yfysrgH70PB1nAKok");
