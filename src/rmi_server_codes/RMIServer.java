@@ -35,9 +35,9 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 
 		System.out.println("Server starts.....!");
 		
-		Timer t = new Timer(0, null);
+		Timer timer = new Timer(0, null);
 
-		t.addActionListener(new ActionListener() {
+		timer.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -49,9 +49,9 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 			}
 		});
 
-		t.setRepeats(true);
-		t.setDelay(15000); // repeat interval
-		t.start();
+		timer.setRepeats(true);
+		timer.setDelay(15000); // repeat interval
+		timer.start();
 
 	}
 
@@ -64,11 +64,11 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 	 */
 	@Override
 	public String getAllSensorDetails() throws RemoteException {
-		HttpClient client = HttpClient.newHttpClient();
+		HttpClient httpClient = HttpClient.newHttpClient();
 		// prepare a HTTP request to send to API
 		HttpRequest request = HttpRequest
 				.newBuilder(URI.create("https://fire-alert-solution.herokuapp.com/api/v1/sensors/")).build();
-		return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body)
+		return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body)
 				.thenApply((responseBody) -> parse(responseBody)).join();
 	}
 
@@ -106,8 +106,8 @@ public class RMIServer extends UnicastRemoteObject implements RMIService {
 				res = "failed";
 			}
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			try {
 				httpClient.close();
